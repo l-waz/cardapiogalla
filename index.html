@@ -301,17 +301,33 @@
           return (
             <div className="min-h-screen bg-amber-50">
               <header className="bg-amber-600 text-white p-6 shadow-lg">
-                <div className="max-w-6xl mx-auto flex justify-between items-center">
-                  <div>
-                    <h1 className="text-3xl font-bold">Galla Delícias Artesanais</h1>
-                    <p className="text-amber-100">Nossa produção é 100% artesanal</p>
+                <div className="max-w-6xl mx-auto">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex-1">
+                      <h1 className="text-3xl font-bold mb-3">Galla Delícias Artesanais</h1>
+                      <div className="bg-white text-amber-800 px-4 py-3 rounded-lg mb-3 inline-block">
+                        <p className="text-sm font-semibold">
+                          ⏰ Cardápio para reservas - Para pedir agora consulte o estoque disponível{' '}
+                          <a 
+                            href="https://wa.me/5541995275146?text=Olá!%20Gostaria%20de%20consultar%20o%20estoque%20disponível" 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-blue-600 underline font-bold hover:text-blue-800"
+                          >
+                            clicando aqui
+                          </a>
+                        </p>
+                      </div>
+                      <p className="text-amber-100">Nossa produção é 100% artesanal.</p>
+                      <p className="text-amber-100">"A propósito, sim, é de hoje. Na verdade, como temos fornadas o dia todo, é provável que seja desta hora!"</p>
+                    </div>
+                    <button onClick={() => setMostrarCarrinho(true)} className="relative bg-white text-amber-600 p-3 rounded-full hover:bg-amber-50 transition ml-4">
+                      <ShoppingCart />
+                      {totalItens > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{totalItens}</span>
+                      )}
+                    </button>
                   </div>
-                  <button onClick={() => setMostrarCarrinho(true)} className="relative bg-white text-amber-600 p-3 rounded-full hover:bg-amber-50 transition">
-                    <ShoppingCart />
-                    {totalItens > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{totalItens}</span>
-                    )}
-                  </button>
                 </div>
               </header>
               <main className="max-w-6xl mx-auto p-6">
