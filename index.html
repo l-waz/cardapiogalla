@@ -11,8 +11,383 @@
 </head>
 <body>
     <div id="root"></div>
+    
     <script type="text/babel">
-        // COLE AQUI O CÓDIGO DO REACT (todo o código do artifact)
-    </script>
-</body>
-</html>
+        const { useState, useEffect } = React;
+        
+        // Ícones Lucide (simplificados)
+        const ShoppingCart = () => (
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+        );
+        const Plus = ({size = 20}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        );
+        const Minus = ({size = 16}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+        );
+        const X = ({size = 24}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        );
+        const Calendar = ({size = 20}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+        );
+        const Clock = ({size = 20}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+        );
+        const MapPin = ({size = 20}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+        );
+        const Phone = ({size = 20}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+        );
+        const CreditCard = ({size = 20}) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+        );
+
+        const produtos = [
+          { id: 1, nome: 'Cuca com uva', descricao: 'Massa macia com cobertura de uva e farofa', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop' },
+          { id: 2, nome: 'Doguinho', descricao: 'Pão de cachorro-quente artesanal', preco: 1.20, imagem: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop' },
+          { id: 3, nome: 'Cuca meio a meio (chocobco+chocopto)', descricao: 'Metade chocolate branco e metade chocolate preto', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop' },
+          { id: 4, nome: 'Cuca com goiabada', descricao: 'Massa macia com recheio de goiabada e farofa', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1613564834361-9436948817d1?w=400&h=300&fit=crop' },
+          { id: 5, nome: 'Cuca com chocolate preto', descricao: 'Massa macia com cobertura de chocolate meio amargo', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=400&h=300&fit=crop' },
+          { id: 6, nome: 'Cuca com chocolate branco', descricao: 'Massa macia com cobertura de chocolate branco', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1534620808146-d33bb39128b2?w=400&h=300&fit=crop' },
+          { id: 7, nome: 'Cuca com doce de leite', descricao: 'Massa macia com recheio de doce de leite e farofa', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop' },
+          { id: 8, nome: 'Cuca com banana', descricao: 'Massa macia com recheio de banana e farofa', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop' },
+          { id: 9, nome: 'Cuca com creme de chocolate e avelã', descricao: 'Massa macia com creme de chocolate e avelã', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop' },
+          { id: 10, nome: 'Cuca sem recheio com farofa', descricao: 'Massa macia tradicional com farofa crocante', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1613564834361-9436948817d1?w=400&h=300&fit=crop' },
+          { id: 11, nome: 'Enroladinho de presunto e queijo', descricao: 'Massa folhada com presunto e queijo', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=400&h=300&fit=crop' },
+          { id: 12, nome: 'Enroladinho de calabresa', descricao: 'Massa folhada com calabresa defumada', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1534620808146-d33bb39128b2?w=400&h=300&fit=crop' },
+          { id: 13, nome: 'Esfirra de frango', descricao: 'Massa macia recheada com frango temperado', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&h=300&fit=crop' },
+          { id: 14, nome: 'Pão Caseiro', descricao: 'Pão caseiro tradicional feito com ingredientes selecionados', preco: 10.00, imagem: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop' },
+          { id: 15, nome: 'Enroladinho de calabresa com cheddar', descricao: 'Massa folhada com calabresa e queijo cheddar', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop' },
+          { id: 16, nome: 'Enroladinho de frango com cheddar', descricao: 'Massa folhada com frango e queijo cheddar', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1613564834361-9436948817d1?w=400&h=300&fit=crop' },
+          { id: 17, nome: 'Esfirra de carne', descricao: 'Massa macia recheada com carne temperada', preco: 12.00, imagem: 'https://images.unsplash.com/photo-1603532648955-039310d9ed75?w=400&h=300&fit=crop' }
+        ];
+
+        const horariosDisponiveis = {
+          baixo: ['08:00-09:00', '09:00-10:00', '10:00-11:00', '14:00-15:00', '15:00-16:00', '16:00-17:00'],
+          medio: ['08:00-09:00', '10:00-11:00', '15:00-16:00'],
+          alto: ['10:00-11:00', '15:00-16:00']
+        };
+
+        function PadariaCardapio() {
+          const [carrinho, setCarrinho] = useState([]);
+          const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
+          const [etapaCarrinho, setEtapaCarrinho] = useState('produtos');
+          const [dataEntrega, setDataEntrega] = useState('');
+          const [horarioEntrega, setHorarioEntrega] = useState('');
+          const [volumeEntregas, setVolumeEntregas] = useState('baixo');
+          const [tipoEntrega, setTipoEntrega] = useState('casablanca');
+          const [bloco, setBloco] = useState('');
+          const [apartamento, setApartamento] = useState('');
+          const [enderecoExterno, setEnderecoExterno] = useState('');
+          const [tipoContato, setTipoContato] = useState('interfone');
+          const [formaPagamento, setFormaPagamento] = useState('pix');
+          const [precisaTroco, setPrecisaTroco] = useState(false);
+          const [valorTroco, setValorTroco] = useState('');
+
+          const adicionarAoCarrinho = (produto) => {
+            const itemExistente = carrinho.find(item => item.id === produto.id);
+            if (itemExistente) {
+              setCarrinho(carrinho.map(item =>
+                item.id === produto.id ? { ...item, quantidade: item.quantidade + 1 } : item
+              ));
+            } else {
+              setCarrinho([...carrinho, { ...produto, quantidade: 1 }]);
+            }
+          };
+
+          const alterarQuantidade = (id, delta) => {
+            setCarrinho(carrinho.map(item => {
+              if (item.id === id) {
+                const novaQuantidade = item.quantidade + delta;
+                return novaQuantidade > 0 ? { ...item, quantidade: novaQuantidade } : item;
+              }
+              return item;
+            }).filter(item => item.quantidade > 0));
+          };
+
+          const removerItem = (id) => {
+            setCarrinho(carrinho.filter(item => item.id !== id));
+          };
+
+          const calcularTotal = () => {
+            return carrinho.reduce((total, item) => total + (item.preco * item.quantidade), 0);
+          };
+
+          const totalItens = carrinho.reduce((total, item) => total + item.quantidade, 0);
+
+          useEffect(() => {
+            if (dataEntrega) {
+              const diasDaSemana = new Date(dataEntrega + 'T00:00:00').getDay();
+              if (diasDaSemana === 0 || diasDaSemana === 6) {
+                setVolumeEntregas('baixo');
+              } else {
+                const horaAtual = new Date().getHours();
+                if (horaAtual >= 7 && horaAtual <= 9) {
+                  setVolumeEntregas('alto');
+                } else if (horaAtual >= 10 && horaAtual <= 13) {
+                  setVolumeEntregas('medio');
+                } else {
+                  setVolumeEntregas('baixo');
+                }
+              }
+            }
+          }, [dataEntrega]);
+
+          const finalizarPedido = () => {
+            let mensagem = '🛒 *NOVO PEDIDO - PADARIA DELÍCIA*\n\n';
+            
+            mensagem += '📦 *PRODUTOS:*\n';
+            carrinho.forEach(item => {
+              mensagem += `${item.quantidade}x ${item.nome} - R$ ${(item.preco * item.quantidade).toFixed(2)}\n`;
+            });
+            
+            mensagem += `\n💰 *TOTAL: R$ ${calcularTotal().toFixed(2)}*\n\n`;
+            
+            mensagem += '📅 *ENTREGA:*\n';
+            mensagem += `Data: ${new Date(dataEntrega + 'T00:00:00').toLocaleDateString('pt-BR')}\n`;
+            mensagem += `Horário: ${horarioEntrega}\n\n`;
+            
+            mensagem += '📍 *LOCAL:*\n';
+            if (tipoEntrega === 'casablanca') {
+              mensagem += `Condomínio Casablanca - Bloco ${bloco}`;
+              if (apartamento) mensagem += ` Apt ${apartamento}`;
+              mensagem += '\n';
+            } else if (tipoEntrega === 'externo') {
+              mensagem += `Endereço Externo:\n${enderecoExterno}\n`;
+              mensagem += '⚠️ Entrega via Uber (custas do cliente)\n';
+            } else {
+              mensagem += 'Retirar na Portaria\n';
+            }
+            
+            if (tipoEntrega !== 'portaria') {
+              mensagem += `Contato: ${tipoContato === 'interfone' ? 'Interfonar' : 'WhatsApp'}\n`;
+            }
+            
+            mensagem += '\n💳 *PAGAMENTO:*\n';
+            if (formaPagamento === 'pix') mensagem += 'PIX';
+            else if (formaPagamento === 'credito') mensagem += 'Cartão de Crédito';
+            else if (formaPagamento === 'debito') mensagem += 'Cartão de Débito';
+            else {
+              mensagem += 'Dinheiro';
+              if (precisaTroco) mensagem += ` - Troco para R$ ${valorTroco}`;
+            }
+            
+            const mensagemCodificada = encodeURIComponent(mensagem);
+            const numeroWhatsApp = '5541995275146';
+            const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
+            
+            window.open(urlWhatsApp, '_blank');
+            
+            alert('Pedido enviado para WhatsApp! Aguarde nossa confirmação.');
+            setCarrinho([]);
+            setMostrarCarrinho(false);
+            setEtapaCarrinho('produtos');
+          };
+
+          if (mostrarCarrinho) {
+            return (
+              <div className="min-h-screen bg-amber-50 p-4">
+                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-bold text-amber-800">Carrinho de Compras</h2>
+                    <button onClick={() => setMostrarCarrinho(false)} className="text-gray-500 hover:text-gray-700">
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  {etapaCarrinho === 'produtos' && (
+                    <div>
+                      {carrinho.length === 0 ? (
+                        <p className="text-center text-gray-500 py-8">Seu carrinho está vazio</p>
+                      ) : (
+                        <>
+                          {carrinho.map(item => (
+                            <div key={item.id} className="flex items-center gap-4 border-b py-4">
+                              <img src={item.imagem} alt={item.nome} className="w-20 h-20 object-cover rounded" />
+                              <div className="flex-1">
+                                <h3 className="font-semibold">{item.nome}</h3>
+                                <p className="text-sm text-gray-600">R$ {item.preco.toFixed(2)}</p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <button onClick={() => alterarQuantidade(item.id, -1)} className="p-1 bg-gray-200 rounded hover:bg-gray-300">
+                                  <Minus size={16} />
+                                </button>
+                                <span className="w-8 text-center">{item.quantidade}</span>
+                                <button onClick={() => alterarQuantidade(item.id, 1)} className="p-1 bg-gray-200 rounded hover:bg-gray-300">
+                                  <Plus size={16} />
+                                </button>
+                              </div>
+                              <p className="font-semibold w-24 text-right">R$ {(item.preco * item.quantidade).toFixed(2)}</p>
+                              <button onClick={() => removerItem(item.id)} className="text-red-500 hover:text-red-700">
+                                <X size={20} />
+                              </button>
+                            </div>
+                          ))}
+                          <div className="mt-6 text-right">
+                            <p className="text-2xl font-bold text-amber-800">Total: R$ {calcularTotal().toFixed(2)}</p>
+                            <button onClick={() => setEtapaCarrinho('entrega')} className="mt-4 bg-amber-600 text-white px-8 py-3 rounded-lg hover:bg-amber-700 font-semibold">
+                              Continuar para Entrega
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {etapaCarrinho === 'entrega' && (
+                    <div className="space-y-6">
+                      <div>
+                        <label className="flex items-center gap-2 font-semibold mb-2">
+                          <Calendar size={20} />
+                          Data de Entrega
+                        </label>
+                        <input type="date" value={dataEntrega} min={new Date().toISOString().split('T')[0]} onChange={(e) => setDataEntrega(e.target.value)} className="w-full p-3 border rounded-lg" />
+                      </div>
+
+                      {dataEntrega && (
+                        <div>
+                          <label className="flex items-center gap-2 font-semibold mb-2">
+                            <Clock size={20} />
+                            Horário de Entrega
+                          </label>
+                          <select value={horarioEntrega} onChange={(e) => setHorarioEntrega(e.target.value)} className="w-full p-3 border rounded-lg">
+                            <option value="">Selecione um horário</option>
+                            {horariosDisponiveis[volumeEntregas].map(horario => (
+                              <option key={horario} value={horario}>{horario}</option>
+                            ))}
+                          </select>
+                          <p className="text-sm text-gray-600 mt-1">Volume de entregas previsto: {volumeEntregas === 'baixo' ? 'Baixo' : volumeEntregas === 'medio' ? 'Médio' : 'Alto'}</p>
+                        </div>
+                      )}
+
+                      <div>
+                        <label className="flex items-center gap-2 font-semibold mb-2">
+                          <MapPin size={20} />
+                          Tipo de Entrega
+                        </label>
+                        <div className="space-y-3">
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="casablanca" checked={tipoEntrega === 'casablanca'} onChange={(e) => setTipoEntrega(e.target.value)} />
+                            <span>Entrega no Condomínio Casablanca</span>
+                          </label>
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="externo" checked={tipoEntrega === 'externo'} onChange={(e) => setTipoEntrega(e.target.value)} />
+                            <span>Entrega Externa</span>
+                          </label>
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="portaria" checked={tipoEntrega === 'portaria'} onChange={(e) => setTipoEntrega(e.target.value)} />
+                            <span>Retirar na Portaria</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {tipoEntrega === 'casablanca' && (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="font-semibold mb-2 block">Bloco *</label>
+                            <input type="text" value={bloco} onChange={(e) => setBloco(e.target.value)} placeholder="Ex: A" className="w-full p-3 border rounded-lg" required />
+                          </div>
+                          <div>
+                            <label className="font-semibold mb-2 block">Apartamento</label>
+                            <input type="text" value={apartamento} onChange={(e) => setApartamento(e.target.value)} placeholder="Ex: 101" className="w-full p-3 border rounded-lg" />
+                          </div>
+                        </div>
+                      )}
+
+                      {tipoEntrega === 'externo' && (
+                        <div>
+                          <label className="font-semibold mb-2 block">Endereço Completo *</label>
+                          <textarea value={enderecoExterno} onChange={(e) => setEnderecoExterno(e.target.value)} placeholder="Rua, número, complemento, bairro, cidade" className="w-full p-3 border rounded-lg" rows="3" required />
+                          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <p className="text-sm text-blue-800">⚠️ Entregas externas ao condomínio são enviadas por Uber com as custas a cargo do cliente.</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {tipoEntrega !== 'portaria' && (
+                        <div>
+                          <label className="flex items-center gap-2 font-semibold mb-2">
+                            <Phone size={20} />
+                            Forma de Contato
+                          </label>
+                          <div className="space-y-2">
+                            <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                              <input type="radio" value="interfone" checked={tipoContato === 'interfone'} onChange={(e) => setTipoContato(e.target.value)} />
+                              <span>Interfonar</span>
+                            </label>
+                            <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                              <input type="radio" value="whatsapp" checked={tipoContato === 'whatsapp'} onChange={(e) => setTipoContato(e.target.value)} />
+                              <span>Avisar pelo WhatsApp</span>
+                            </label>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex gap-4">
+                        <button onClick={() => setEtapaCarrinho('produtos')} className="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 font-semibold">Voltar</button>
+                        <button onClick={() => setEtapaCarrinho('pagamento')} className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-lg hover:bg-amber-700 font-semibold">Continuar para Pagamento</button>
+                      </div>
+                    </div>
+                  )}
+
+                  {etapaCarrinho === 'pagamento' && (
+                    <div className="space-y-6">
+                      <div>
+                        <label className="flex items-center gap-2 font-semibold mb-2">
+                          <CreditCard size={20} />
+                          Forma de Pagamento
+                        </label>
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="pix" checked={formaPagamento === 'pix'} onChange={(e) => setFormaPagamento(e.target.value)} />
+                            <span>PIX</span>
+                          </label>
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="credito" checked={formaPagamento === 'credito'} onChange={(e) => setFormaPagamento(e.target.value)} />
+                            <span>Cartão de Crédito</span>
+                          </label>
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="debito" checked={formaPagamento === 'debito'} onChange={(e) => setFormaPagamento(e.target.value)} />
+                            <span>Cartão de Débito</span>
+                          </label>
+                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                            <input type="radio" value="dinheiro" checked={formaPagamento === 'dinheiro'} onChange={(e) => setFormaPagamento(e.target.value)} />
+                            <span>Dinheiro</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {formaPagamento === 'dinheiro' && (
+                        <div>
+                          <label className="flex items-center gap-2 mb-3">
+                            <input type="checkbox" checked={precisaTroco} onChange={(e) => setPrecisaTroco(e.target.checked)} className="w-4 h-4" />
+                            <span className="font-semibold">Preciso de troco</span>
+                          </label>
+                          {precisaTroco && (
+                            <div>
+                              <label className="font-semibold mb-2 block">Troco para quanto?</label>
+                              <input type="number" value={valorTroco} onChange={(e) => setValorTroco(e.target.value)} placeholder="R$ 0,00" className="w-full p-3 border rounded-lg" step="0.01" />
+                            </div>
+                          )}
