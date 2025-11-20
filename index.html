@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Animação suave para a notificação */
         @keyframes slideIn {
             from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
             to { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -48,7 +47,6 @@
           { id: 8, nome: 'Cuca com banana', descricao: 'Massa macia com recheio de banana e farofa', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 9, nome: 'Cuca com creme de avelã', descricao: 'Massa macia com creme de chocolate e avelã', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 10, nome: 'Cuca sem recheio', descricao: 'Massa macia tradicional com farofa crocante', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
-          // Produtos com imagem corrigida (placeholder)
           { id: 11, nome: 'Enroladinho de P/Q', descricao: 'Massa macia do pão com presunto e queijo', preco: 1.20, imagem: 'https://placehold.co/600x400/png?text=Sem+Foto' },
           { id: 12, nome: 'Enroladinho de calabresa', descricao: 'Massa do pão caseiro com calabresa defumada', preco: 1.20, imagem: 'https://i.postimg.cc/1t3v2pBD/20250225_151104.jpg' },
           { id: 13, nome: 'Esfirra de frango', descricao: 'Massa macia recheada com frango temperado', preco: 1.20, imagem: 'https://placehold.co/600x400/png?text=Sem+Foto' },
@@ -79,10 +77,8 @@
           const [formaPagamento, setFormaPagamento] = useState('pix');
           const [precisaTroco, setPrecisaTroco] = useState(false);
           const [valorTroco, setValorTroco] = useState('');
-          // Estado para a notificação (Toast)
           const [notificacao, setNotificacao] = useState(null);
 
-          // Efeito para carregar carrinho salvo
           useEffect(() => {
             const carrinhoSalvo = localStorage.getItem('carrinhoGalla');
             if (carrinhoSalvo) {
@@ -94,17 +90,15 @@
             }
           }, []);
 
-          // Efeito para salvar carrinho sempre que mudar
           useEffect(() => {
             localStorage.setItem('carrinhoGalla', JSON.stringify(carrinho));
           }, [carrinho]);
 
-          // Função para mostrar notificação
           const mostrarNotificacao = (nomeProduto) => {
             setNotificacao(`${nomeProduto} adicionado ao carrinho!`);
             setTimeout(() => {
               setNotificacao(null);
-            }, 3000); // Some após 3 segundos
+            }, 3000);
           };
 
           const adicionarAoCarrinho = (produto) => {
@@ -189,10 +183,12 @@
               if (precisaTroco) mensagem += ` - Troco para R$ ${valorTroco}`;
             }
             const mensagemCodificada = encodeURIComponent(mensagem);
-            const numeroWhatsApp = '5541995275146';
+            
+            // --- NÚMERO ATUALIZADO AQUI ---
+            const numeroWhatsApp = '5541995275062';
+            
             const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
             
-            // Limpar carrinho após envio
             setCarrinho([]);
             localStorage.removeItem('carrinhoGalla');
             setMostrarCarrinho(false);
@@ -201,7 +197,6 @@
             window.open(urlWhatsApp, '_blank');
           };
 
-          // Componente para o botão flutuante do carrinho
           const FloatingCartButton = () => (
             <button 
               onClick={() => setMostrarCarrinho(true)} 
@@ -216,10 +211,8 @@
             </button>
           );
 
-          // Se o carrinho estiver aberto, renderiza a tela de checkout com fundo LIMPO
           if (mostrarCarrinho) {
             return (
-              // MUDANÇA AQUI: Fundo bg-gray-100 (cinza bem claro) para melhor leitura
               <div className="min-h-screen bg-gray-100 p-4">
                 <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-6 my-4">
                   <div className="flex justify-between items-center mb-6 border-b pb-4">
@@ -386,7 +379,6 @@
 
           return (
             <div className="min-h-screen bg-amber-50 pb-20 relative">
-              {/* Notificação Toast */}
               {notificacao && (
                 <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-2xl z-[100] flex items-center gap-2 toast-notification font-semibold text-sm sm:text-base">
                     <CheckCircle size={20} />
@@ -394,14 +386,12 @@
                 </div>
               )}
 
-              {/* Header */}
               <header className="bg-amber-600 text-white p-6 shadow-lg sticky top-0 z-40">
                 <div className="max-w-6xl mx-auto flex justify-between items-center">
                     <div>
                       <h1 className="text-2xl md:text-3xl font-bold">Galla Delícias Artesanais</h1>
                       <p className="text-amber-100 text-sm hidden md:block">Produção 100% artesanal e feita no dia.</p>
                     </div>
-                    {/* Botão do Header (Mantido para Desktop) */}
                     <button onClick={() => setMostrarCarrinho(true)} className="bg-white text-amber-600 p-2 md:px-4 md:py-2 rounded-full hover:bg-amber-50 transition font-bold flex items-center gap-2 shadow-md">
                       <ShoppingCart size={20} />
                       <span className="hidden md:inline">Carrinho ({totalItens})</span>
@@ -413,7 +403,8 @@
                 <div className="bg-white p-4 rounded-lg shadow-sm mb-6 border-l-4 border-amber-500">
                     <p className="text-amber-800 font-medium">
                       ⏰ <strong>Dica:</strong> Para pedir agora e verificar o estoque imediato, 
-                      <a href="https://wa.me/5541995275146?text=Olá!%20Gostaria%20de%20consultar%20o%20estoque%20disponível" target="_blank" className="text-blue-600 underline ml-1 hover:text-blue-800">clique aqui</a>.
+                      {/* --- LINK DO WHATSAPP ATUALIZADO AQUI --- */}
+                      <a href="https://wa.me/5541995275062?text=Olá!%20Gostaria%20de%20consultar%20o%20estoque%20disponível" target="_blank" className="text-blue-600 underline ml-1 hover:text-blue-800">clique aqui</a>.
                     </p>
                 </div>
 
@@ -443,7 +434,6 @@
                 </div>
               </div>
               
-              {/* Botão Flutuante Sempre Visível */}
               <FloatingCartButton />
             </div>
           );
