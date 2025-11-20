@@ -8,6 +8,16 @@
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Animação suave para a notificação */
+        @keyframes slideIn {
+            from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+        .toast-notification {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -15,7 +25,8 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
         
-        const ShoppingCart = () => (<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>);
+        // Ícones
+        const ShoppingCart = ({size = 24}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>);
         const Plus = ({size = 20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>);
         const Minus = ({size = 16}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>);
         const X = ({size = 24}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>);
@@ -24,25 +35,27 @@
         const MapPin = ({size = 20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>);
         const Phone = ({size = 20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>);
         const CreditCard = ({size = 20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>);
+        const CheckCircle = ({size = 20}) => (<svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>);
 
         const produtos = [
           { id: 1, nome: 'Pão Caseiro', descricao: 'Pão caseiro tradicional feito com ingredientes selecionados', preco: 10.00, imagem: 'https://i.postimg.cc/Qtdfwpmf/20250225-093528.jpg' },
           { id: 2, nome: 'Doguinho', descricao: 'Massa do pão caseiro e salscicha', preco: 1.20, imagem: 'https://i.postimg.cc/d0L7f3dR/20250225-151329.jpg' },
-          { id: 3, nome: 'Cuca meio a meio (chocobco+chocopto)', descricao: 'Recheio Metade chocolate branco e metade chocolate preto', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
+          { id: 3, nome: 'Cuca meio a meio', descricao: 'Recheio Metade chocolate branco e metade chocolate preto', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 4, nome: 'Cuca com goiabada', descricao: 'Massa macia com recheio de goiabada e farofa', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 5, nome: 'Cuca com chocolate preto', descricao: 'Massa macia com recheio de chocolate meio amargo', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 6, nome: 'Cuca com chocolate branco', descricao: 'Massa macia com recheio de chocolate branco', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 7, nome: 'Cuca com doce de leite', descricao: 'Massa macia com recheio de doce de leite e farofa', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
           { id: 8, nome: 'Cuca com banana', descricao: 'Massa macia com recheio de banana e farofa', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
-          { id: 9, nome: 'Cuca com creme de chocolate e avelã', descricao: 'Massa macia com creme de chocolate e avelã', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
-          { id: 10, nome: 'Cuca sem recheio com farofa', descricao: 'Massa macia tradicional com farofa crocante', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
-          { id: 11, nome: 'Enroladinho de presunto e queijo', descricao: 'Massa macia do pão com presunto e queijo', preco: 1.20, imagem: 'https://' },
+          { id: 9, nome: 'Cuca com creme de avelã', descricao: 'Massa macia com creme de chocolate e avelã', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
+          { id: 10, nome: 'Cuca sem recheio', descricao: 'Massa macia tradicional com farofa crocante', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
+          // Produtos com imagem corrigida (placeholder)
+          { id: 11, nome: 'Enroladinho de P/Q', descricao: 'Massa macia do pão com presunto e queijo', preco: 1.20, imagem: 'https://placehold.co/600x400/png?text=Sem+Foto' },
           { id: 12, nome: 'Enroladinho de calabresa', descricao: 'Massa do pão caseiro com calabresa defumada', preco: 1.20, imagem: 'https://i.postimg.cc/1t3v2pBD/20250225_151104.jpg' },
-          { id: 13, nome: 'Esfirra de frango', descricao: 'Massa macia recheada com frango temperado', preco: 1.20, imagem: 'https://' },
+          { id: 13, nome: 'Esfirra de frango', descricao: 'Massa macia recheada com frango temperado', preco: 1.20, imagem: 'https://placehold.co/600x400/png?text=Sem+Foto' },
           { id: 14, nome: 'Cuca com uva', descricao: 'Massa macia com recheio de uva e farofa', preco: 12.00, imagem: 'https://i.postimg.cc/76ZKdg9N/20250226_180611.jpg' },
-          { id: 15, nome: 'Enroladinho de calabresa com cheddar', descricao: 'Massa macia do pão com calabresa e queijo cheddar', preco: 1.20, imagem: 'https://' },
-          { id: 16, nome: 'Enroladinho de frango com cheddar', descricao: 'Massa do pão caseiro com frango e queijo cheddar', preco:1.20, imagem: 'https://i.postimg.cc/gJ2gQvsR/20250225_150034.jpg' },
-          { id: 17, nome: 'Esfirra de carne', descricao: 'Massa macia recheada com carne temperada', preco: 1.20, imagem: 'https://' }
+          { id: 15, nome: 'Enroladinho Calabresa/Cheddar', descricao: 'Massa macia do pão com calabresa e queijo cheddar', preco: 1.20, imagem: 'https://placehold.co/600x400/png?text=Sem+Foto' },
+          { id: 16, nome: 'Enroladinho Frango/Cheddar', descricao: 'Massa do pão caseiro com frango e queijo cheddar', preco:1.20, imagem: 'https://i.postimg.cc/gJ2gQvsR/20250225_150034.jpg' },
+          { id: 17, nome: 'Esfirra de carne', descricao: 'Massa macia recheada com carne temperada', preco: 1.20, imagem: 'https://placehold.co/600x400/png?text=Sem+Foto' }
         ];
 
         const horariosDisponiveis = {
@@ -66,6 +79,33 @@
           const [formaPagamento, setFormaPagamento] = useState('pix');
           const [precisaTroco, setPrecisaTroco] = useState(false);
           const [valorTroco, setValorTroco] = useState('');
+          // Estado para a notificação (Toast)
+          const [notificacao, setNotificacao] = useState(null);
+
+          // Efeito para carregar carrinho salvo
+          useEffect(() => {
+            const carrinhoSalvo = localStorage.getItem('carrinhoGalla');
+            if (carrinhoSalvo) {
+              try {
+                setCarrinho(JSON.parse(carrinhoSalvo));
+              } catch (e) {
+                console.error("Erro ao carregar carrinho", e);
+              }
+            }
+          }, []);
+
+          // Efeito para salvar carrinho sempre que mudar
+          useEffect(() => {
+            localStorage.setItem('carrinhoGalla', JSON.stringify(carrinho));
+          }, [carrinho]);
+
+          // Função para mostrar notificação
+          const mostrarNotificacao = (nomeProduto) => {
+            setNotificacao(`${nomeProduto} adicionado ao carrinho!`);
+            setTimeout(() => {
+              setNotificacao(null);
+            }, 3000); // Some após 3 segundos
+          };
 
           const adicionarAoCarrinho = (produto) => {
             const itemExistente = carrinho.find(item => item.id === produto.id);
@@ -76,6 +116,7 @@
             } else {
               setCarrinho([...carrinho, { ...produto, quantidade: 1 }]);
             }
+            mostrarNotificacao(produto.nome);
           };
 
           const alterarQuantidade = (id, delta) => {
@@ -150,146 +191,191 @@
             const mensagemCodificada = encodeURIComponent(mensagem);
             const numeroWhatsApp = '5541995275146';
             const urlWhatsApp = `https://wa.me/${numeroWhatsApp}?text=${mensagemCodificada}`;
-            window.open(urlWhatsApp, '_blank');
-            alert('Pedido enviado para WhatsApp! Aguarde nossa confirmação.');
+            
+            // Limpar carrinho após envio
             setCarrinho([]);
+            localStorage.removeItem('carrinhoGalla');
             setMostrarCarrinho(false);
             setEtapaCarrinho('produtos');
+            
+            window.open(urlWhatsApp, '_blank');
           };
 
+          // Componente para o botão flutuante do carrinho
+          const FloatingCartButton = () => (
+            <button 
+              onClick={() => setMostrarCarrinho(true)} 
+              className="fixed bottom-6 right-6 bg-amber-600 text-white p-4 rounded-full shadow-2xl z-50 flex items-center justify-center hover:bg-amber-700 hover:scale-105 transition-all duration-300 border-4 border-white"
+            >
+              <ShoppingCart size={28} />
+              {totalItens > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-7 h-7 flex items-center justify-center border-2 border-white">
+                  {totalItens}
+                </span>
+              )}
+            </button>
+          );
+
+          // Se o carrinho estiver aberto, renderiza a tela de checkout com fundo LIMPO
           if (mostrarCarrinho) {
             return (
-              <div className="min-h-screen bg-amber-50 p-4">
-                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-amber-800">Carrinho de Compras</h2>
-                    <button onClick={() => setMostrarCarrinho(false)} className="text-gray-500 hover:text-gray-700"><X size={24} /></button>
+              // MUDANÇA AQUI: Fundo bg-gray-100 (cinza bem claro) para melhor leitura
+              <div className="min-h-screen bg-gray-100 p-4">
+                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xl p-6 my-4">
+                  <div className="flex justify-between items-center mb-6 border-b pb-4">
+                    <h2 className="text-2xl font-bold text-gray-800">Carrinho de Compras</h2>
+                    <button onClick={() => setMostrarCarrinho(false)} className="text-gray-500 hover:text-red-600 transition"><X size={28} /></button>
                   </div>
+                  
                   {etapaCarrinho === 'produtos' && (
                     <div>
                       {carrinho.length === 0 ? (
-                        <p className="text-center text-gray-500 py-8">Seu carrinho está vazio</p>
+                        <div className="text-center py-12">
+                            <div className="flex justify-center mb-4 text-gray-300"><ShoppingCart size={64}/></div>
+                            <p className="text-gray-500 text-lg">Seu carrinho está vazio</p>
+                            <button onClick={() => setMostrarCarrinho(false)} className="mt-4 text-amber-600 font-bold hover:underline">Voltar ao cardápio</button>
+                        </div>
                       ) : (
                         <>
-                          {carrinho.map(item => (
-                            <div key={item.id} className="flex items-center gap-4 border-b py-4">
-                              <img src={item.imagem} alt={item.nome} className="w-20 h-20 object-cover rounded" />
-                              <div className="flex-1">
-                                <h3 className="font-semibold">{item.nome}</h3>
-                                <p className="text-sm text-gray-600">R$ {item.preco.toFixed(2)}</p>
+                          <div className="space-y-4">
+                            {carrinho.map(item => (
+                              <div key={item.id} className="flex items-center gap-4 border p-3 rounded-lg bg-gray-50">
+                                <img 
+                                  src={item.imagem} 
+                                  alt={item.nome} 
+                                  className="w-16 h-16 object-cover rounded-md bg-gray-200"
+                                  onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/400x300/e2e8f0/64748b?text=Sem+Foto'; }}
+                                />
+                                <div className="flex-1">
+                                  <h3 className="font-semibold text-gray-800">{item.nome}</h3>
+                                  <p className="text-sm text-gray-600">R$ {item.preco.toFixed(2)}</p>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <button onClick={() => alterarQuantidade(item.id, -1)} className="p-1 bg-white border rounded hover:bg-gray-100 text-gray-600"><Minus size={16} /></button>
+                                  <span className="w-4 text-center font-medium">{item.quantidade}</span>
+                                  <button onClick={() => alterarQuantidade(item.id, 1)} className="p-1 bg-white border rounded hover:bg-gray-100 text-gray-600"><Plus size={16} /></button>
+                                </div>
+                                <p className="font-bold w-20 text-right text-gray-800">R$ {(item.preco * item.quantidade).toFixed(2)}</p>
+                                <button onClick={() => removerItem(item.id)} className="text-red-400 hover:text-red-600 p-2"><X size={20} /></button>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <button onClick={() => alterarQuantidade(item.id, -1)} className="p-1 bg-gray-200 rounded hover:bg-gray-300"><Minus size={16} /></button>
-                                <span className="w-8 text-center">{item.quantidade}</span>
-                                <button onClick={() => alterarQuantidade(item.id, 1)} className="p-1 bg-gray-200 rounded hover:bg-gray-300"><Plus size={16} /></button>
-                              </div>
-                              <p className="font-semibold w-24 text-right">R$ {(item.preco * item.quantidade).toFixed(2)}</p>
-                              <button onClick={() => removerItem(item.id)} className="text-red-500 hover:text-red-700"><X size={20} /></button>
+                            ))}
+                          </div>
+                          <div className="mt-8 pt-6 border-t">
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-gray-600">Total do pedido:</span>
+                                <span className="text-3xl font-bold text-amber-700">R$ {calcularTotal().toFixed(2)}</span>
                             </div>
-                          ))}
-                          <div className="mt-6 text-right">
-                            <p className="text-2xl font-bold text-amber-800">Total: R$ {calcularTotal().toFixed(2)}</p>
-                            <button onClick={() => setEtapaCarrinho('entrega')} className="mt-4 bg-amber-600 text-white px-8 py-3 rounded-lg hover:bg-amber-700 font-semibold">Continuar para Entrega</button>
+                            <button onClick={() => setEtapaCarrinho('entrega')} className="w-full bg-green-600 text-white py-4 rounded-lg hover:bg-green-700 font-bold text-lg shadow-lg transition transform hover:scale-[1.01]">Continuar para Entrega</button>
                           </div>
                         </>
                       )}
                     </div>
                   )}
+                  
                   {etapaCarrinho === 'entrega' && (
-                    <div className="space-y-6">
-                      <div>
-                        <label className="flex items-center gap-2 font-semibold mb-2"><Calendar size={20} />Data de Entrega</label>
-                        <input type="date" value={dataEntrega} min={new Date().toISOString().split('T')[0]} onChange={(e) => setDataEntrega(e.target.value)} className="w-full p-3 border rounded-lg" />
+                    <div className="space-y-6 animate-fade-in">
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <label className="flex items-center gap-2 font-bold text-blue-800 mb-3"><Calendar size={20} /> Data da Entrega</label>
+                        <input type="date" value={dataEntrega} min={new Date().toISOString().split('T')[0]} onChange={(e) => setDataEntrega(e.target.value)} className="w-full p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" />
                       </div>
+
                       {dataEntrega && (
-                        <div>
-                          <label className="flex items-center gap-2 font-semibold mb-2"><Clock size={20} />Horário de Entrega</label>
-                          <select value={horarioEntrega} onChange={(e) => setHorarioEntrega(e.target.value)} className="w-full p-3 border rounded-lg">
-                            <option value="">Selecione um horário</option>
+                        <div className="bg-amber-50 p-4 rounded-lg border border-amber-100">
+                          <label className="flex items-center gap-2 font-bold text-amber-800 mb-3"><Clock size={20} /> Horário Preferencial</label>
+                          <select value={horarioEntrega} onChange={(e) => setHorarioEntrega(e.target.value)} className="w-full p-3 border border-amber-200 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                            <option value="">Selecione um horário...</option>
                             {horariosDisponiveis[volumeEntregas].map(horario => (<option key={horario} value={horario}>{horario}</option>))}
                           </select>
-                          <p className="text-sm text-gray-600 mt-1">Volume de entregas previsto: {volumeEntregas === 'baixo' ? 'Baixo' : volumeEntregas === 'medio' ? 'Médio' : 'Alto'}</p>
                         </div>
                       )}
-                      <div>
-                        <label className="flex items-center gap-2 font-semibold mb-2"><MapPin size={20} />Tipo de Entrega</label>
+
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <label className="flex items-center gap-2 font-bold text-gray-700 mb-3"><MapPin size={20} /> Onde devemos entregar?</label>
                         <div className="space-y-3">
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" value="casablanca" checked={tipoEntrega === 'casablanca'} onChange={(e) => setTipoEntrega(e.target.value)} />
-                            <span>Entrega no Condomínio Casablanca</span>
-                          </label>
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" value="externo" checked={tipoEntrega === 'externo'} onChange={(e) => setTipoEntrega(e.target.value)} />
-                            <span>Entrega Externa</span>
-                          </label>
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <input type="radio" value="portaria" checked={tipoEntrega === 'portaria'} onChange={(e) => setTipoEntrega(e.target.value)} />
-                            <span>Retirar na Portaria</span>
-                          </label>
+                          {['casablanca', 'externo', 'portaria'].map((tipo) => (
+                            <label key={tipo} className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition ${tipoEntrega === tipo ? 'bg-white border-amber-500 shadow-sm' : 'hover:bg-gray-100'}`}>
+                                <input type="radio" value={tipo} checked={tipoEntrega === tipo} onChange={(e) => setTipoEntrega(e.target.value)} className="w-4 h-4 text-amber-600 focus:ring-amber-500" />
+                                <span className="font-medium">{tipo === 'casablanca' ? 'Condomínio Casablanca' : tipo === 'externo' ? 'Endereço Externo (Via Uber)' : 'Retirar na Portaria'}</span>
+                            </label>
+                          ))}
                         </div>
+                      
+                        {tipoEntrega === 'casablanca' && (
+                            <div className="grid grid-cols-2 gap-4 mt-4">
+                            <div><label className="text-sm font-semibold text-gray-600 mb-1 block">Bloco *</label><input type="text" value={bloco} onChange={(e) => setBloco(e.target.value)} placeholder="Ex: A" className="w-full p-3 border rounded-lg" required /></div>
+                            <div><label className="text-sm font-semibold text-gray-600 mb-1 block">Apartamento</label><input type="text" value={apartamento} onChange={(e) => setApartamento(e.target.value)} placeholder="Ex: 101" className="w-full p-3 border rounded-lg" /></div>
+                            </div>
+                        )}
+                        {tipoEntrega === 'externo' && (
+                            <div className="mt-4">
+                            <label className="text-sm font-semibold text-gray-600 mb-1 block">Endereço Completo *</label>
+                            <textarea value={enderecoExterno} onChange={(e) => setEnderecoExterno(e.target.value)} placeholder="Rua, número, bairro..." className="w-full p-3 border rounded-lg" rows="3" required />
+                            </div>
+                        )}
                       </div>
-                      {tipoEntrega === 'casablanca' && (
-                        <div className="grid grid-cols-2 gap-4">
-                          <div><label className="font-semibold mb-2 block">Bloco *</label><input type="text" value={bloco} onChange={(e) => setBloco(e.target.value)} placeholder="Ex: A" className="w-full p-3 border rounded-lg" required /></div>
-                          <div><label className="font-semibold mb-2 block">Apartamento</label><input type="text" value={apartamento} onChange={(e) => setApartamento(e.target.value)} placeholder="Ex: 101" className="w-full p-3 border rounded-lg" /></div>
-                        </div>
-                      )}
-                      {tipoEntrega === 'externo' && (
-                        <div>
-                          <label className="font-semibold mb-2 block">Endereço Completo *</label>
-                          <textarea value={enderecoExterno} onChange={(e) => setEnderecoExterno(e.target.value)} placeholder="Rua, número, complemento, bairro, cidade" className="w-full p-3 border rounded-lg" rows="3" required />
-                          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg"><p className="text-sm text-blue-800">⚠️ Entregas externas ao condomínio são enviadas por Uber com as custas a cargo do cliente.</p></div>
-                        </div>
-                      )}
+
                       {tipoEntrega !== 'portaria' && (
-                        <div>
-                          <label className="flex items-center gap-2 font-semibold mb-2"><Phone size={20} />Forma de Contato</label>
-                          <div className="space-y-2">
-                            <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                              <input type="radio" value="interfone" checked={tipoContato === 'interfone'} onChange={(e) => setTipoContato(e.target.value)} />
-                              <span>Interfonar</span>
-                            </label>
-                            <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                              <input type="radio" value="whatsapp" checked={tipoContato === 'whatsapp'} onChange={(e) => setTipoContato(e.target.value)} />
-                              <span>Avisar pelo WhatsApp</span>
-                            </label>
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <label className="flex items-center gap-2 font-bold text-gray-700 mb-3"><Phone size={20} /> Ao chegar, como avisamos?</label>
+                          <div className="flex gap-4">
+                             <label className="flex items-center gap-2 cursor-pointer"><input type="radio" value="interfone" checked={tipoContato === 'interfone'} onChange={(e) => setTipoContato(e.target.value)} /> Interfone</label>
+                             <label className="flex items-center gap-2 cursor-pointer"><input type="radio" value="whatsapp" checked={tipoContato === 'whatsapp'} onChange={(e) => setTipoContato(e.target.value)} /> WhatsApp</label>
                           </div>
                         </div>
                       )}
-                      <div className="flex gap-4">
-                        <button onClick={() => setEtapaCarrinho('produtos')} className="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 font-semibold">Voltar</button>
-                        <button onClick={() => setEtapaCarrinho('pagamento')} className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-lg hover:bg-amber-700 font-semibold">Continuar para Pagamento</button>
+
+                      <div className="flex gap-4 pt-4">
+                        <button onClick={() => setEtapaCarrinho('produtos')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-bold">Voltar</button>
+                        <button onClick={() => setEtapaCarrinho('pagamento')} className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-lg hover:bg-amber-700 font-bold">Ir para Pagamento</button>
                       </div>
                     </div>
                   )}
+                  
                   {etapaCarrinho === 'pagamento' && (
                     <div className="space-y-6">
-                      <div>
-                        <label className="flex items-center gap-2 font-semibold mb-2"><CreditCard size={20} />Forma de Pagamento</label>
+                      <div className="bg-white p-4 rounded-lg border border-gray-200">
+                        <label className="flex items-center gap-2 font-bold text-gray-700 mb-4"><CreditCard size={20} /> Como deseja pagar?</label>
                         <div className="space-y-2">
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="radio" value="pix" checked={formaPagamento === 'pix'} onChange={(e) => setFormaPagamento(e.target.value)} /><span>PIX</span></label>
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="radio" value="credito" checked={formaPagamento === 'credito'} onChange={(e) => setFormaPagamento(e.target.value)} /><span>Cartão de Crédito</span></label>
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="radio" value="debito" checked={formaPagamento === 'debito'} onChange={(e) => setFormaPagamento(e.target.value)} /><span>Cartão de Débito</span></label>
-                          <label className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:bg-gray-50"><input type="radio" value="dinheiro" checked={formaPagamento === 'dinheiro'} onChange={(e) => setFormaPagamento(e.target.value)} /><span>Dinheiro</span></label>
+                          {['pix', 'credito', 'debito', 'dinheiro'].map((forma) => (
+                             <label key={forma} className={`flex items-center gap-3 p-4 border rounded-lg cursor-pointer transition ${formaPagamento === forma ? 'bg-amber-50 border-amber-500' : 'hover:bg-gray-50'}`}>
+                                <input type="radio" value={forma} checked={formaPagamento === forma} onChange={(e) => setFormaPagamento(e.target.value)} className="text-amber-600" />
+                                <span className="capitalize font-medium">{forma === 'pix' ? 'PIX (Chave Celular)' : forma}</span>
+                             </label>
+                          ))}
                         </div>
                       </div>
+                      
                       {formaPagamento === 'dinheiro' && (
-                        <div>
-                          <label className="flex items-center gap-2 mb-3"><input type="checkbox" checked={precisaTroco} onChange={(e) => setPrecisaTroco(e.target.checked)} className="w-4 h-4" /><span className="font-semibold">Preciso de troco</span></label>
-                          {precisaTroco && (<div><label className="font-semibold mb-2 block">Troco para quanto?</label><input type="number" value={valorTroco} onChange={(e) => setValorTroco(e.target.value)} placeholder="R$ 0,00" className="w-full p-3 border rounded-lg" step="0.01" /></div>)}
+                        <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200 animate-fade-in">
+                          <label className="flex items-center gap-2 mb-3 cursor-pointer">
+                              <input type="checkbox" checked={precisaTroco} onChange={(e) => setPrecisaTroco(e.target.checked)} className="w-5 h-5 text-amber-600 rounded" />
+                              <span className="font-semibold text-gray-800">Preciso de troco</span>
+                          </label>
+                          {precisaTroco && (
+                              <div>
+                                  <label className="text-sm font-semibold text-gray-600 mb-1 block">Troco para quanto?</label>
+                                  <input type="number" value={valorTroco} onChange={(e) => setValorTroco(e.target.value)} placeholder="Ex: 50,00" className="w-full p-3 border border-yellow-300 rounded-lg bg-white" step="0.01" />
+                              </div>
+                          )}
                         </div>
                       )}
-                      <div className="bg-amber-50 p-4 rounded-lg">
-                        <h3 className="font-bold text-lg mb-2">Resumo do Pedido</h3>
-                        <p>Data: {new Date(dataEntrega + 'T00:00:00').toLocaleDateString('pt-BR')}</p>
-                        <p>Horário: {horarioEntrega}</p>
-                        <p>Entrega: {tipoEntrega === 'casablanca' ? `Condomínio - Bloco ${bloco}${apartamento ? ` Apt ${apartamento}` : ''}` : tipoEntrega === 'externo' ? 'Endereço Externo' : 'Retirar na Portaria'}</p>
-                        <p>Pagamento: {formaPagamento === 'pix' ? 'PIX' : formaPagamento === 'credito' ? 'Cartão de Crédito' : formaPagamento === 'debito' ? 'Cartão de Débito' : 'Dinheiro'}</p>
-                        <p className="text-xl font-bold mt-2">Total: R$ {calcularTotal().toFixed(2)}</p>
+                      
+                      <div className="bg-gray-800 text-white p-6 rounded-xl shadow-lg">
+                        <h3 className="font-bold text-xl mb-4 flex items-center gap-2"><CheckCircle /> Resumo do Pedido</h3>
+                        <div className="space-y-2 text-gray-300 text-sm">
+                            <p>📅 {dataEntrega ? new Date(dataEntrega + 'T00:00:00').toLocaleDateString('pt-BR') : 'Data pendente'} às {horarioEntrega || '--:--'}</p>
+                            <p>📍 {tipoEntrega === 'casablanca' ? 'Condomínio Casablanca' : tipoEntrega === 'externo' ? 'Endereço Externo' : 'Portaria'}</p>
+                            <p>💳 Pagamento via {formaPagamento.toUpperCase()}</p>
+                        </div>
+                        <div className="mt-4 pt-4 border-t border-gray-600 flex justify-between items-end">
+                            <span className="text-gray-400">Total a pagar:</span>
+                            <span className="text-3xl font-bold text-green-400">R$ {calcularTotal().toFixed(2)}</span>
+                        </div>
                       </div>
-                      <div className="flex gap-4">
-                        <button onClick={() => setEtapaCarrinho('entrega')} className="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-400 font-semibold">Voltar</button>
-                        <button onClick={finalizarPedido} className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold">Finalizar Pedido</button>
+
+                      <div className="flex gap-4 pt-2">
+                        <button onClick={() => setEtapaCarrinho('entrega')} className="flex-1 bg-gray-200 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-300 font-bold">Voltar</button>
+                        <button onClick={finalizarPedido} className="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-bold shadow-lg transform hover:-translate-y-1 transition">✅ Enviar Pedido</button>
                       </div>
                     </div>
                   )}
@@ -299,58 +385,66 @@
           }
 
           return (
-            <div className="min-h-screen bg-amber-50">
-              <header className="bg-amber-600 text-white p-6 shadow-lg">
-                <div className="max-w-6xl mx-auto">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h1 className="text-3xl font-bold mb-3">Galla Delícias Artesanais</h1>
-                      <div className="bg-white text-amber-800 px-4 py-3 rounded-lg mb-3 inline-block">
-                        <p className="text-sm font-semibold">
-                          ⏰ Cardápio para reservas - Para pedir agora consulte o estoque disponível{' '}
-                          <a 
-                            href="https://wa.me/5541995275146?text=Olá!%20Gostaria%20de%20consultar%20o%20estoque%20disponível" 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline font-bold hover:text-blue-800"
-                          >
-                            clicando aqui
-                          </a>
-                        </p>
-                      </div>
-                      <p className="text-amber-100">Nossa produção é 100% artesanal.</p>
-                      <p className="text-amber-100">"A propósito, sim, é de hoje. Na verdade, como temos fornadas o dia todo, é provável que seja desta hora!"</p>
+            <div className="min-h-screen bg-amber-50 pb-20 relative">
+              {/* Notificação Toast */}
+              {notificacao && (
+                <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-full shadow-2xl z-[100] flex items-center gap-2 toast-notification font-semibold text-sm sm:text-base">
+                    <CheckCircle size={20} />
+                    {notificacao}
+                </div>
+              )}
+
+              {/* Header */}
+              <header className="bg-amber-600 text-white p-6 shadow-lg sticky top-0 z-40">
+                <div className="max-w-6xl mx-auto flex justify-between items-center">
+                    <div>
+                      <h1 className="text-2xl md:text-3xl font-bold">Galla Delícias Artesanais</h1>
+                      <p className="text-amber-100 text-sm hidden md:block">Produção 100% artesanal e feita no dia.</p>
                     </div>
-                    <button onClick={() => setMostrarCarrinho(true)} className="relative bg-white text-amber-600 p-3 rounded-full hover:bg-amber-50 transition ml-4">
-                      <ShoppingCart />
-                      {totalItens > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">{totalItens}</span>
-                      )}
+                    {/* Botão do Header (Mantido para Desktop) */}
+                    <button onClick={() => setMostrarCarrinho(true)} className="bg-white text-amber-600 p-2 md:px-4 md:py-2 rounded-full hover:bg-amber-50 transition font-bold flex items-center gap-2 shadow-md">
+                      <ShoppingCart size={20} />
+                      <span className="hidden md:inline">Carrinho ({totalItens})</span>
                     </button>
-                  </div>
                 </div>
               </header>
-              <main className="max-w-6xl mx-auto p-6">
-                <h2 className="text-2xl font-bold text-amber-800 mb-6">Nossos Produtos</h2>
+
+              <div className="max-w-6xl mx-auto p-4">
+                <div className="bg-white p-4 rounded-lg shadow-sm mb-6 border-l-4 border-amber-500">
+                    <p className="text-amber-800 font-medium">
+                      ⏰ <strong>Dica:</strong> Para pedir agora e verificar o estoque imediato, 
+                      <a href="https://wa.me/5541995275146?text=Olá!%20Gostaria%20de%20consultar%20o%20estoque%20disponível" target="_blank" className="text-blue-600 underline ml-1 hover:text-blue-800">clique aqui</a>.
+                    </p>
+                </div>
+
+                <h2 className="text-2xl font-bold text-amber-800 mb-6 border-b pb-2">Nossos Produtos</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {produtos.map(produto => (
-                    <div key={produto.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
-                      <img src={produto.imagem} alt={produto.nome} className="w-full h-48 object-cover" />
-                      <div className="p-4">
-                        <h3 className="text-xl font-bold text-amber-800 mb-2">{produto.nome}</h3>
-                        <p className="text-sm text-gray-600 mb-3">{produto.descricao}</p>
-                        <div className="flex justify-between items-center">
-                          <span className="text-2xl font-bold text-green-600">R$ {produto.preco.toFixed(2)}</span>
-                          <button onClick={() => adicionarAoCarrinho(produto)} className="bg-amber-600 text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition flex items-center gap-2">
-                            <Plus size={20} />
-                            Adicionar
-                          </button>
+                    <div key={produto.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-amber-100">
+                      <img 
+                        src={produto.imagem} 
+                        alt={produto.nome} 
+                        className="w-full h-48 object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x400/e2e8f0/64748b?text=Foto+Indisponível'; }}
+                      />
+                      <div className="p-5">
+                        <div className="flex justify-between items-start mb-2">
+                            <h3 className="text-xl font-bold text-gray-800 leading-tight">{produto.nome}</h3>
+                            <span className="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full">R$ {produto.preco.toFixed(2)}</span>
                         </div>
+                        <p className="text-sm text-gray-600 mb-4 h-10 line-clamp-2">{produto.descricao}</p>
+                        <button onClick={() => adicionarAoCarrinho(produto)} className="w-full bg-amber-600 text-white py-3 rounded-lg hover:bg-amber-700 transition font-semibold flex items-center justify-center gap-2 active:scale-95">
+                          <Plus size={20} />
+                          Adicionar ao Carrinho
+                        </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              </main>
+              </div>
+              
+              {/* Botão Flutuante Sempre Visível */}
+              <FloatingCartButton />
             </div>
           );
         }
